@@ -44,7 +44,7 @@ public class CategoryDao {
         return categories;
     }
 
-    public Optional<Category> findById(Long id) {
+    public Optional<Category> findById(long id) {
         String sql = "select id, parent_id, name, sort, status, create_time, update_time from categories where id = ?";
         try (
                 Connection connection = DBUtil.getConnection();
