@@ -13,33 +13,39 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+// handle request params
 @WebServlet("/books")
 public class BookListServlet extends HttpServlet {
+    private static final int DEFAULT_PAGE_NUM = 1;
+    private static final int DEFAULT_PAGE_SIZE = 5;
+    private static final int MIN_PAGE_SIZE = 5;
+    private static final int MAX_PAGE_SIZE = 50;
 
     private final BookService bookService = new BookServiceImpl(new BookDaoImpl());
+
+    private static int getPageSize(HttpServletRequest req) {
+        int pageSize = parseInt(req.getParameter("pageSize"), DEFAULT_PAGE_SIZE);
+        return Math.max(MIN_PAGE_SIZE, Math.min(MAX_PAGE_SIZE, pageSize));
+    }
+
+    private static int getPageNum(HttpServletRequest req) {
+        return Math.max(1, parseInt(req.getParameter("pageNum"), DEFAULT_PAGE_NUM));
+    }
+
+    private static int parseInt(String value, int defaultValue) {
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
 
-        int pageSize;
-        int pageNum;
-        int maxPageSize = 50;
-        int minPageSize = 5;
-        try {
-            pageSize = Integer.parseInt(req.getParameter("pageSize"));
-        } catch (NumberFormatException e) {
-            pageSize = minPageSize;
-        }
-
-        pageSize = Math.min(maxPageSize, Math.max(pageSize, minPageSize));
-
-        try {
-            pageNum = Integer.parseInt(req.getParameter("page"));
-        } catch (NumberFormatException e) {
-
-            pageNum = 1;
-        }
+        int pageSize = getPageSize(req);
+        int pageNum = getPageNum(req);
 
 
         PageResult<BookListDTO> pageResult = bookService.findByPage(pageSize, pageNum);

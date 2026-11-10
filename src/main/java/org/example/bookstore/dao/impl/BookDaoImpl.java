@@ -14,34 +14,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+// handle DB logic
 public class BookDaoImpl implements BookDao {
 
     private static List<BookListDTO> findBooksByPage(int pageSize, int pageNum) {
-        long offset = (long) pageSize * (pageNum - 1);
-
 
         String sql = "select b.id, b.title, b.author, b.cover, b.price, c.name as category_name from books b join categories c on b.category_id = c.id order by b.id limit ? offset ?";
         List<BookListDTO> dtoList = new ArrayList<>();
 
-        try (Connection conn = DBUtil.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)
-
-        ) {
+        try (Connection conn = DBUtil.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            long offset = (long) pageSize * (pageNum - 1);
             stmt.setInt(1, pageSize);
             stmt.setLong(2, offset);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    BookListDTO dto = new BookListDTO();
-                    dto.setId(rs.getLong("id"));
-                    dto.setTitle(rs.getString("title"));
-                    dto.setAuthor(rs.getString("author"));
-                    dto.setCover(rs.getString("cover"));
-                    dto.setPrice(rs.getBigDecimal("price"));
-                    dto.setCategoryName(rs.getString("category_name"));
-
-                    dtoList.add(dto);
+                    dtoList.add(createBookListDTO(rs));
                 }
-
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -49,9 +38,41 @@ public class BookDaoImpl implements BookDao {
         return dtoList;
     }
 
+    private static BookListDTO createBookListDTO(ResultSet rs) throws SQLException {
+        BookListDTO dto = new BookListDTO();
+        dto.setId(rs.getLong("id"));
+        dto.setTitle(rs.getString("title"));
+        dto.setAuthor(rs.getString("author"));
+        dto.setCover(rs.getString("cover"));
+        dto.setPrice(rs.getBigDecimal("price"));
+        dto.setCategoryName(rs.getString("category_name"));
+        return dto;
+    }
+
+    private static Book mapRow(ResultSet rs) throws SQLException {
+        Book book = new Book();
+        book.setId(rs.getLong("id"));
+        book.setAuthor(rs.getString("author"));
+        book.setCategoryId(rs.getLong("category_id"));
+        book.setTitle(rs.getString("title"));
+        book.setPublisher(rs.getString("publisher"));
+        book.setIsbn(rs.getString("isbn"));
+        book.setCover(rs.getString("cover"));
+        book.setPrice(rs.getBigDecimal("price"));
+        book.setStock(rs.getInt("stock"));
+        book.setDescription(rs.getString("description"));
+        book.setStatus(rs.getInt("status"));
+        book.setCreateTime(rs.getTimestamp("create_time").toLocalDateTime());
+        book.setUpdateTime(rs.getTimestamp("update_time").toLocalDateTime());
+        return book;
+
+    }
+
     @Override
     public Optional<Book> findById(long id) {
+
         String sql = "SELECT id, category_id, title, author, publisher, isbn, cover, price, stock, description, status, create_time, update_time FROM books WHERE id = ?";
+
         try (Connection connection = DBUtil.getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setLong(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -64,7 +85,6 @@ public class BookDaoImpl implements BookDao {
         } catch (SQLException e) {
             throw new RuntimeException("Failed to find book by id: " + id, e);
         }
-
     }
 
     @Override
@@ -87,30 +107,11 @@ public class BookDaoImpl implements BookDao {
             pageResult.setTotalPages(totalPages);
             pageResult.setTotalRecords(totalRecords);
 
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException("count books failed: ", e);
         }
         List<BookListDTO> books = findBooksByPage(pageResult.getPageSize(), pageResult.getPageNum());
         pageResult.setList(books);
         return pageResult;
-    }
-
-    private static Book mapRow(ResultSet rs) throws SQLException {
-        Book book = new Book();
-        book.setId(rs.getLong("id"));
-        book.setAuthor(rs.getString("author"));
-        book.setCategoryId(rs.getLong("category_id"));
-        book.setTitle(rs.getString("title"));
-        book.setPublisher(rs.getString("publisher"));
-        book.setIsbn(rs.getString("isbn"));
-        book.setCover(rs.getString("cover"));
-        book.setPrice(rs.getBigDecimal("price"));
-        book.setStock(rs.getInt("stock"));
-        book.setDescription(rs.getString("description"));
-        book.setStatus(rs.getInt("status"));
-        book.setCreateTime(rs.getTimestamp("create_time").toLocalDateTime());
-        book.setUpdateTime(rs.getTimestamp("update_time").toLocalDateTime());
-        return book;
-
     }
 }

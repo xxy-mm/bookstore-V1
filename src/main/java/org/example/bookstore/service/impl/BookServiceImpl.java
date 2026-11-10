@@ -7,6 +7,7 @@ import org.example.bookstore.entity.Book;
 import org.example.bookstore.exception.BookNotFoundException;
 import org.example.bookstore.service.BookService;
 
+// handle business logic
 public class BookServiceImpl implements BookService {
     private final BookDao bookDao;
 

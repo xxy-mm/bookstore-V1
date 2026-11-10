@@ -1,5 +1,6 @@
 package org.example.bookstore.dao.impl;
 
+import org.example.bookstore.dao.CategoryDao;
 import org.example.bookstore.entity.Category;
 import org.example.bookstore.util.DBUtil;
 
@@ -9,7 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 
-public class CategoryDaoImpl implements org.example.bookstore.dao.CategoryDao {
+public class CategoryDaoImpl implements CategoryDao {
 
 
     private Category mapRow(ResultSet rs) throws SQLException {
