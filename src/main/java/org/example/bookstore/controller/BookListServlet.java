@@ -1,8 +1,10 @@
 package org.example.bookstore.controller;
 
-import org.example.bookstore.dao.BookDao;
+import org.example.bookstore.dao.impl.BookDaoImpl;
 import org.example.bookstore.dto.BookListDTO;
 import org.example.bookstore.dto.PageResult;
+import org.example.bookstore.service.BookService;
+import org.example.bookstore.service.impl.BookServiceImpl;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,7 +16,7 @@ import java.io.IOException;
 @WebServlet("/books")
 public class BookListServlet extends HttpServlet {
 
-    private final BookDao bookDao = new BookDao();
+    private final BookService bookService = new BookServiceImpl(new BookDaoImpl());
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -23,7 +25,7 @@ public class BookListServlet extends HttpServlet {
         int pageSize;
         int pageNum;
         int maxPageSize = 50;
-        int minPageSize = 2;
+        int minPageSize = 5;
         try {
             pageSize = Integer.parseInt(req.getParameter("pageSize"));
         } catch (NumberFormatException e) {
@@ -40,7 +42,7 @@ public class BookListServlet extends HttpServlet {
         }
 
 
-        PageResult<BookListDTO> pageResult = bookDao.findPage(pageSize, pageNum);
+        PageResult<BookListDTO> pageResult = bookService.findByPage(pageSize, pageNum);
         req.setAttribute("pageResult", pageResult);
         req.getRequestDispatcher("/WEB-INF/view/book/list.jsp").forward(req, resp);
 

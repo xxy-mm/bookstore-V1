@@ -77,7 +77,7 @@
     <c:forEach items="${pageResult.list}" var="book">
         <tr>
             <td>${book.id}</td>
-            <td><a href="${pageContext.request.contextPath}/book?id=${book.id}"><c:out value="${book.title}"/></td>
+            <td><a href="${pageContext.request.contextPath}/book/detail?id=${book.id}"><c:out value="${book.title}"/></td>
             <td><c:out value="${book.author}"/></td>
             <td>${book.price}</td>
             <td><c:out value="${book.categoryName}"/></td>
@@ -147,10 +147,7 @@
 
         <select name="pageSize" id="pageSize"
                 onchange="this.form.submit()">
-<option value="2"
-                    <c:if test="${pageResult.pageSize == 2}">selected</c:if>>
-                    2 条
-                </option>
+
              <option value="5"
                     <c:if test="${pageResult.pageSize == 5}">selected</c:if>>
                     5 条
