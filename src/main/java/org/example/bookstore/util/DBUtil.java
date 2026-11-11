@@ -6,7 +6,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class DBUtil {
+public final class DBUtil {
     private static final String Driver;
     private static final String  URL;
     private static final String USERNAME;
