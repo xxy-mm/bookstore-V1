@@ -1,7 +1,6 @@
 package org.example.bookstore.entity;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
@@ -9,7 +8,6 @@ import java.time.LocalDateTime;
 
 @Setter
 @Getter
-@NoArgsConstructor
 public class Book {
     private Long id;
     private Long categoryId;
