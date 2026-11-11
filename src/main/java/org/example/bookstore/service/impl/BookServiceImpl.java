@@ -27,4 +27,9 @@ public class BookServiceImpl implements BookService {
                 .orElseThrow(() -> new BookNotFoundException(id));
 
     }
+
+    @Override
+    public PageResult<BookListDTO> findByPage(int pageSize, int pageNum, long categoryId) {
+        return bookDao.findPage(pageSize, pageNum, categoryId);
+    }
 }

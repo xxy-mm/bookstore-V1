@@ -23,4 +23,6 @@ public interface BookDao {
      * @return a PageResult object contains the records and page related information
      */
     PageResult<BookListDTO> findPage(int pageSize, int pageNum);
+
+    PageResult<BookListDTO> findPage(int pageSize, int pageNum, long categoryId);
 }

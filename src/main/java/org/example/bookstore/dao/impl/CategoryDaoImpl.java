@@ -8,12 +8,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class CategoryDaoImpl implements CategoryDao {
 
-
-    private Category mapRow(ResultSet rs) throws SQLException {
+    private static Category mapRow(ResultSet rs) throws SQLException {
 
         Category category = new Category();
         category.setId(rs.getLong("id"));
@@ -29,6 +30,7 @@ public class CategoryDaoImpl implements CategoryDao {
 
     @Override
     public Optional<Category> findById(long id) {
+
         String sql = "select id, parent_id, name, sort, status, create_time, update_time from categories where id = ?";
         try (
                 Connection connection = DBUtil.getConnection();
@@ -43,10 +45,64 @@ public class CategoryDaoImpl implements CategoryDao {
                 return Optional.empty();
             }
 
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to find category by id: " + id, e);
         }
     }
 
+    @Override
+    public List<Category> findAll() {
+
+        String sql = "SELECT id, parent_id,name,sort,status, " +
+                "create_time, update_time " +
+                "FROM categories ORDER BY sort, id;";
+        return getCategories(sql);
+    }
+
+    @Override
+    public List<Category> findAllEnabled() {
+
+        String sql = "SELECT id, parent_id,name,sort,status, " +
+                "create_time, update_time " +
+                "FROM categories WHERE status=1 ORDER BY sort, id;";
+        return getCategories(sql);
+    }
+
+    @Override
+    public boolean isEnabled(long categoryId) {
+
+        String sql = "select status from categories where id = ?";
+
+        try (
+                Connection connection = DBUtil.getConnection();
+                PreparedStatement stmt = connection.prepareStatement(sql)
+        ) {
+            stmt.setLong(1, categoryId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next() && rs.getInt("status") == 1;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to check status for id: " + categoryId, e);
+        }
+
+    }
+
+    private List<Category> getCategories(String sql) {
+
+        List<Category> categories = new ArrayList<>();
+        try (Connection connection = DBUtil.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Category category = mapRow(rs);
+                categories.add(category);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to get all categories.", e);
+        }
+
+        return categories;
+    }
 
 }

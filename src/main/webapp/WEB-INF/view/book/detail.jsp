@@ -1,7 +1,7 @@
 
-<%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
+<%@page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<jsp:useBean id="book" scope="request" type="org.example.bookstore.entity.Book"/>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -9,7 +9,6 @@
     <title><c:out value="${book.title}"/> - 图书详情</title>
 </head>
 <body>
-
     <h1><c:out value="${book.title}"/></h1>
 
     <div>
@@ -18,7 +17,8 @@
 
     <p>作者：<c:out value="${book.author}"/></p>
 
-    <p>出版社：<c:out value="${book.publisher}"/></p>
+    <p>出版社：
+    <c:out value="${book.publisher}"/></p>
 
     <p>ISBN：${book.isbn}</p>
 
@@ -28,5 +28,10 @@
 
     <p>图书简介：<c:out value="${book.description}"/></p>
 
+    1<%= request.getContextPath() %>
+
+    2${param.name}
+
+    3${pageContext.request.contextPath}
 </body>
 </html>

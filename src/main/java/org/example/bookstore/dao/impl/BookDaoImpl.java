@@ -38,7 +38,30 @@ public class BookDaoImpl implements BookDao {
         return dtoList;
     }
 
+    private static List<BookListDTO> findBooksByPageAndCategory(int pageSize, int pageNum, long categoryId) {
+
+        String sql = "select b.id, b.title, b.author, b.cover, b.price, c.name as category_name from books b join categories c on b.category_id = c.id where b.category_id = ? order by b.id limit ? offset ?";
+        List<BookListDTO> dtoList = new ArrayList<>();
+
+        try (Connection conn = DBUtil.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            long offset = (long) pageSize * (pageNum - 1);
+            stmt.setLong(1, categoryId);
+            stmt.setInt(2, pageSize);
+            stmt.setLong(3, offset);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    dtoList.add(createBookListDTO(rs));
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return dtoList;
+    }
+
     private static BookListDTO createBookListDTO(ResultSet rs) throws SQLException {
+
         BookListDTO dto = new BookListDTO();
         dto.setId(rs.getLong("id"));
         dto.setTitle(rs.getString("title"));
@@ -50,6 +73,7 @@ public class BookDaoImpl implements BookDao {
     }
 
     private static Book mapRow(ResultSet rs) throws SQLException {
+
         Book book = new Book();
         book.setId(rs.getLong("id"));
         book.setAuthor(rs.getString("author"));
@@ -90,28 +114,72 @@ public class BookDaoImpl implements BookDao {
     @Override
     public PageResult<BookListDTO> findPage(int pageSize, int pageNum) {
 
-        PageResult<BookListDTO> pageResult = new PageResult<>();
         String sql = "select count(*) from books";
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            rs.next();
-
-            long totalRecords = rs.getLong(1);
-            int totalPages = totalRecords == 0 ? 0 : (int) ((totalRecords - 1) / pageSize + 1);
-            int actualPageNum = totalPages == 0 ? 1 : Math.min(pageNum, totalPages);
-
-
-            pageResult.setPageNum(actualPageNum);
-            pageResult.setPageSize(pageSize);
-            pageResult.setTotalPages(totalPages);
-            pageResult.setTotalRecords(totalRecords);
-
+        long count;
+        try {
+            count = getCount(sql);
         } catch (SQLException e) {
-            throw new RuntimeException("count books failed: ", e);
+            throw new RuntimeException(e);
         }
+
+        PageResult<BookListDTO> pageResult = fillPageInfo(pageSize, pageNum, count);
         List<BookListDTO> books = findBooksByPage(pageResult.getPageSize(), pageResult.getPageNum());
         pageResult.setList(books);
+        return pageResult;
+
+    }
+
+    @Override
+    public PageResult<BookListDTO> findPage(int pageSize, int pageNum, long categoryId) {
+
+        String countSql = "select count(*) from books where category_id = ?";
+        long count;
+        try {
+            count = getCount(countSql, categoryId);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to get count:", e);
+        }
+        PageResult<BookListDTO> pageResult = fillPageInfo(pageSize, pageNum, count);
+        List<BookListDTO> bookListDTOS = findBooksByPageAndCategory(pageSize, pageNum, categoryId);
+        pageResult.setList(bookListDTOS);
+        return pageResult;
+    }
+
+    /**
+     * get count
+     *
+     * @param countSql a sql to query count
+     * @return the count
+     * @throws SQLException if the query failed
+     */
+    private long getCount(String countSql, Object... args) throws SQLException {
+
+        try (Connection connection = DBUtil.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(countSql)
+        ) {
+            for (int i = 0; i < args.length; i++) {
+                stmt.setObject(i + 1, args[i]);
+            }
+
+            try (ResultSet rs = stmt.executeQuery()) {
+
+                rs.next();
+                return rs.getLong(1);
+            }
+        }
+    }
+
+    private <T> PageResult<T> fillPageInfo(int pageSize, int pageNum, long totalCount) {
+
+        int totalPages = totalCount == 0 ? 0 : (int) ((totalCount - 1) / pageSize + 1);
+        int actualPageNum = Math.min(Math.max(1, pageNum), totalPages);
+
+        PageResult<T> pageResult = new PageResult<>();
+        pageResult.setTotalRecords(totalCount);
+        pageResult.setPageSize(pageSize);
+        pageResult.setTotalPages(totalPages);
+        pageResult.setPageNum(actualPageNum);
+
         return pageResult;
     }
 }

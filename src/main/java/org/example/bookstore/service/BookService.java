@@ -23,4 +23,6 @@ public interface BookService {
      * @throws org.example.bookstore.exception.BookNotFoundException if the book doesn't exist
      */
     Book findById(long id);
+
+    PageResult<BookListDTO> findByPage(int pageSize, int pageNum, long categoryId);
 }

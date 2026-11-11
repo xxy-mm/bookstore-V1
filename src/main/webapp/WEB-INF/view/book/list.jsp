@@ -1,57 +1,17 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: xxy_m
-  Date: 2026/11/9
-  Time: 21:06
-  To change this template use File | Settings | File Templates.
---%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c"
-           uri="http://java.sun.com/jsp/jstl/core" %>
+<jsp:useBean id="pageResult" scope="request" type="org.example.bookstore.dto.PageResult"/>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
-<html>
+<html data-bs-theme="light">
+
 <head>
     <meta charset="UTF-8">
     <title>图书列表</title>
-
-    <style>
-        table {
-            border-collapse: collapse;
-            width: 800px;
-        }
-
-        th, td {
-            border: 1px solid #ccc;
-            padding: 10px;
-            text-align: left;
-        }
-
-        .pagination {
-            margin-top: 20px;
-        }
-
-        .pagination a,
-        .pagination span {
-            display: inline-block;
-            padding: 6px 12px;
-            margin-right: 5px;
-            border: 1px solid #ccc;
-            text-decoration: none;
-        }
-
-        .pagination .current {
-            background: #337ab7;
-            color: white;
-        }
-
-        .pagination .disabled {
-            color: #999;
-        }
-    </style>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/bootstrap.min.css">
 </head>
 
-<body>
+<body class="container">
 
 <h1>图书列表</h1>
 
@@ -61,7 +21,7 @@
     总页数：${pageResult.totalPages}
 </p>
 
-<table>
+<table class="table">
     <thead>
     <tr>
         <th>ID</th>
@@ -77,10 +37,16 @@
     <c:forEach items="${pageResult.list}" var="book">
         <tr>
             <td>${book.id}</td>
-            <td><a href="${pageContext.request.contextPath}/book/detail?id=${book.id}"><c:out value="${book.title}"/></td>
-            <td><c:out value="${book.author}"/></td>
+            <td><a href="${pageContext.request.contextPath}/book/detail?id=${book.id}">
+                    <c:out value="${book.title}"/>
+            </td>
+            <td>
+                <c:out value="${book.author}"/>
+            </td>
             <td>${book.price}</td>
-            <td><c:out value="${book.categoryName}"/></td>
+            <td>
+                <c:out value="${book.categoryName}"/>
+            </td>
         </tr>
     </c:forEach>
 
@@ -92,89 +58,112 @@
 
     </tbody>
 </table>
+<div class="row">
+    <!-- page navigation -->
+    <div class="col">
+        <nav aria-label="table pagination">
+            <ul class="pagination">
+                <!-- pre -->
+                <c:choose>
+                    <c:when test="${pageResult.pageNum > 1}">
+                        <li class="page-item"><a
+                                href="${pageContext.request.contextPath}/books?pageNum=${pageResult.pageNum - 1}&pageSize=${pageResult.pageSize}&category=${requestScope.categoryId}"
+                                class="page-link">Previous</a></li>
+                    </c:when>
+                    <c:otherwise>
+                        <li class="page-item"><span class="page-link disabled">Previous</span></li>
+                    </c:otherwise>
+                </c:choose>
+                <!-- page -->
+                <c:forEach begin="1" end="${pageResult.totalPages}" var="i">
+                    <c:choose>
+                        <c:when test="${i==pageResult.pageNum}">
+                            <li class="page-item active">
+                                <span class="page-link">${i}</span>
+                            </li>
+                        </c:when>
+                        <c:otherwise>
+                            <li class="page-item"><a class="page-link"
+                                                     href="${pageContext.request.contextPath}/books?pageNum=${i}&pageSize=${pageResult.pageSize}&category=${requestScope.categoryId}">${i}</a>
+                            </li>
+                        </c:otherwise>
+                    </c:choose>
+                </c:forEach>
+                <!-- next -->
+                <c:choose>
+                    <c:when test="${pageResult.pageNum < pageResult.totalPages}">
+                        <li class="page-item"><a
+                                href="${pageContext.request.contextPath}/books?pageNum=${pageResult.pageNum + 1}&pageSize=${pageResult.pageSize}&category=${requestScope.categoryId}"
+                                class="page-link">Next</a></li>
+                    </c:when>
+                    <c:otherwise>
+                        <li class="page-item"><span class="page-link disabled">Next</span></li>
+                    </c:otherwise>
+                </c:choose>
+            </ul>
+        </nav>
+    </div>
+    <%-- form --%>
+    <div class="col">
+        <form action="${pageContext.request.contextPath}/books" method="get">
+            <input type="hidden" name="pageNum" value="1">
+            <div class="form-field">
+                <div class="row">
+                    <label for="pageSize"
+                           class="sm:col-1 col-form-label col-form-label-sm">Size</label>
+                    <div class="sm:col-2">
+                        <select name="pageSize" id="pageSize" class="form-control form-control-sm"
+                                onchange="this.form.submit()">
+                            <option value="5" <c:if test="${pageResult.pageSize == 5}">selected</c:if>>
+                                5 条
+                            </option>
+                            <option value="10"
+                                    <c:if test="${pageResult.pageSize == 10}">selected</c:if>
+                            >
+                                10 条
+                            </option>
+                            <option value="20"
+                                    <c:if test="${pageResult.pageSize == 20}">selected</c:if>
+                            >
+                                20 条
+                            </option>
+                            <option value="50"
+                                    <c:if test="${pageResult.pageSize == 50}">selected</c:if>
+                            >
+                                50 条
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="form-field">
+                <div class="row">
+                    <label for="category" class="sm:col-1 col-form-label col-form-label-sm">Category</label>
+                    <div class="sm:col-2">
+                        <select name="category" id="category" class="form-control form-control-sm"
+                                onchange="this.form.submit()">
+                            <option value="" ${empty categoryId? 'selected':''}>All</option>
+                            <jsp:useBean id="categories" scope="request" type="java.util.List"/>
+                            <c:forEach items="${categories}" var="cate">
+                                <c:choose>
+                                    <c:when test="${categoryId == cate.id}">
+                                        <option value="${cate.id}" selected><c:out value="${cate.name}"/></option>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <option value="${cate.id}"><c:out value="${cate.name}"/></option>
+                                    </c:otherwise>
+                                </c:choose>
 
-<!-- 分页导航 -->
-<div class="pagination">
-
-    <!-- 上一页 -->
-    <c:choose>
-        <c:when test="${pageResult.pageNum > 1}">
-            <a href="${pageContext.request.contextPath}/books?page=${pageResult.pageNum - 1}&pageSize=${pageResult.pageSize}">
-                上一页
-            </a>
-        </c:when>
-        <c:otherwise>
-            <span class="disabled">上一页</span>
-        </c:otherwise>
-    </c:choose>
-
-    <!-- 页码 -->
-    <c:forEach begin="1"
-               end="${pageResult.totalPages}"
-               var="i">
-
-        <c:choose>
-            <c:when test="${i == pageResult.pageNum}">
-                <span class="current">${i}</span>
-            </c:when>
-
-            <c:otherwise>
-                <a href="${pageContext.request.contextPath}/books?page=${i}&pageSize=${pageResult.pageSize}">
-                    ${i}
-                </a>
-            </c:otherwise>
-        </c:choose>
-
-    </c:forEach>
-
-    <!-- 下一页 -->
-    <c:choose>
-        <c:when test="${pageResult.pageNum < pageResult.totalPages}">
-            <a href="${pageContext.request.contextPath}/books?page=${pageResult.pageNum + 1}&pageSize=${pageResult.pageSize}">
-                下一页
-            </a>
-        </c:when>
-        <c:otherwise>
-            <span class="disabled">下一页</span>
-        </c:otherwise>
-    </c:choose>
-    <form action="${pageContext.request.contextPath}/books"
-          method="get">
-
-        <input type="hidden" name="page" value="1">
-
-        <label for="pageSize">每页显示：</label>
-
-        <select name="pageSize" id="pageSize"
-                onchange="this.form.submit()">
-
-             <option value="5"
-                    <c:if test="${pageResult.pageSize == 5}">selected</c:if>>
-                    5 条
-                </option>
-
-                <option value="10"
-                    <c:if test="${pageResult.pageSize == 10}">selected</c:if>>
-                    10 条
-                </option>
-
-                <option value="20"
-                    <c:if test="${pageResult.pageSize == 20}">selected</c:if>>
-                    20 条
-                </option>
-
-                <option value="50"
-                    <c:if test="${pageResult.pageSize == 50}">selected</c:if>>
-                    50 条
-                </option>
-
-        </select>
-
-    </form>
+                            </c:forEach>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
 
 
 </body>
+
 </html>
-
-
