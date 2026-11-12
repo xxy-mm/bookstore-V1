@@ -2,6 +2,8 @@ package org.example.bookstore.dao;
 
 import org.example.bookstore.entity.User;
 
+import java.util.Optional;
+
 public interface UserDao {
 
     /**
@@ -19,4 +21,12 @@ public interface UserDao {
      * @return the generated user id
      */
     long insert(User user);
+
+    /**
+     * find user by username
+     *
+     * @param username the username
+     * @return an optional of User, empty if not found
+     */
+    Optional<User> findByUsername(String username);
 }
