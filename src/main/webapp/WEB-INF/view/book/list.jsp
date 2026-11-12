@@ -1,4 +1,3 @@
-<jsp:useBean id="pageResult" scope="request" type="org.example.bookstore.dto.PageResult"/>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
@@ -16,9 +15,9 @@
 <h1>图书列表</h1>
 
 <p>
-    总记录数：${pageResult.totalRecords}
-    当前页：${pageResult.pageNum}
-    总页数：${pageResult.totalPages}
+    总记录数：${requestScope.pageResult.totalRecords}
+    当前页：${requestScope.pageNum}
+    总页数：${requestScope.totalPages}
 </p>
 
 <table class="table">
@@ -34,7 +33,7 @@
 
     <tbody>
 
-    <c:forEach items="${pageResult.list}" var="book">
+    <c:forEach items="${requestScope.list}" var="book">
         <tr>
             <td>${book.id}</td>
             <td><a href="${pageContext.request.contextPath}/book/detail?id=${book.id}">
@@ -50,7 +49,7 @@
         </tr>
     </c:forEach>
 
-    <c:if test="${empty pageResult.list}">
+    <c:if test="${empty requestScope.list}">
         <tr>
             <td colspan="5">暂无图书</td>
         </tr>
@@ -65,9 +64,9 @@
             <ul class="pagination">
                 <!-- pre -->
                 <c:choose>
-                    <c:when test="${pageResult.pageNum > 1}">
+                    <c:when test="${requestScope.pageNum > 1}">
                         <li class="page-item"><a
-                                href="${pageContext.request.contextPath}/books?pageNum=${pageResult.pageNum - 1}&pageSize=${pageResult.pageSize}&category=${requestScope.categoryId}"
+                                href="${pageContext.request.contextPath}/books?pageNum=${requestScope.pageNum - 1}&pageSize=${requestScope.pageSize}&category=${requestScope.categoryId}"
                                 class="page-link">Previous</a></li>
                     </c:when>
                     <c:otherwise>
@@ -75,25 +74,25 @@
                     </c:otherwise>
                 </c:choose>
                 <!-- page -->
-                <c:forEach begin="1" end="${pageResult.totalPages}" var="i">
+                <c:forEach begin="1" end="${requestScope.totalPages}" var="i">
                     <c:choose>
-                        <c:when test="${i==pageResult.pageNum}">
+                        <c:when test="${i==requestScope.pageNum}">
                             <li class="page-item active">
                                 <span class="page-link">${i}</span>
                             </li>
                         </c:when>
                         <c:otherwise>
                             <li class="page-item"><a class="page-link"
-                                                     href="${pageContext.request.contextPath}/books?pageNum=${i}&pageSize=${pageResult.pageSize}&category=${requestScope.categoryId}">${i}</a>
+                                                     href="${pageContext.request.contextPath}/books?pageNum=${i}&pageSize=${requestScope.pageSize}&category=${requestScope.categoryId}">${i}</a>
                             </li>
                         </c:otherwise>
                     </c:choose>
                 </c:forEach>
                 <!-- next -->
                 <c:choose>
-                    <c:when test="${pageResult.pageNum < pageResult.totalPages}">
+                    <c:when test="${requestScope.pageNum < requestScope.totalPages}">
                         <li class="page-item"><a
-                                href="${pageContext.request.contextPath}/books?pageNum=${pageResult.pageNum + 1}&pageSize=${pageResult.pageSize}&category=${requestScope.categoryId}"
+                                href="${pageContext.request.contextPath}/books?pageNum=${requestScope.pageNum + 1}&pageSize=${requestScope.pageSize}&category=${requestScope.categoryId}"
                                 class="page-link">Next</a></li>
                     </c:when>
                     <c:otherwise>
@@ -114,21 +113,21 @@
                     <div class="sm:col-2">
                         <select name="pageSize" id="pageSize" class="form-control form-control-sm"
                                 onchange="this.form.submit()">
-                            <option value="5" <c:if test="${pageResult.pageSize == 5}">selected</c:if>>
+                            <option value="5" <c:if test="${requestScope.pageSize == 5}">selected</c:if>>
                                 5 条
                             </option>
                             <option value="10"
-                                    <c:if test="${pageResult.pageSize == 10}">selected</c:if>
+                                    <c:if test="${requestScope.pageSize == 10}">selected</c:if>
                             >
                                 10 条
                             </option>
                             <option value="20"
-                                    <c:if test="${pageResult.pageSize == 20}">selected</c:if>
+                                    <c:if test="${requestScope.pageSize == 20}">selected</c:if>
                             >
                                 20 条
                             </option>
                             <option value="50"
-                                    <c:if test="${pageResult.pageSize == 50}">selected</c:if>
+                                    <c:if test="${requestScope.pageSize == 50}">selected</c:if>
                             >
                                 50 条
                             </option>
@@ -142,11 +141,11 @@
                     <div class="sm:col-2">
                         <select name="category" id="category" class="form-control form-control-sm"
                                 onchange="this.form.submit()">
-                            <option value="" ${empty categoryId? 'selected':''}>All</option>
+                            <option value="" ${empty requestScope.categoryId? 'selected':''}>All</option>
                             <jsp:useBean id="categories" scope="request" type="java.util.List"/>
                             <c:forEach items="${categories}" var="cate">
                                 <c:choose>
-                                    <c:when test="${categoryId == cate.id}">
+                                    <c:when test="${requestScope.categoryId == cate.id}">
                                         <option value="${cate.id}" selected><c:out value="${cate.name}"/></option>
                                     </c:when>
                                     <c:otherwise>
