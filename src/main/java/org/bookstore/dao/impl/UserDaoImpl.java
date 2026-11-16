@@ -17,9 +17,9 @@ public class UserDaoImpl implements UserDao {
 
         try (SqlSession sqlSession = MybatisUtil.openSession()) {
             UserMapper mapper = sqlSession.getMapper(UserMapper.class);
-            long userId = mapper.insertUser(user);
+            long affectedRows = mapper.insertUser(user);
             sqlSession.commit();
-            return userId;
+            return affectedRows;
         } catch (PersistenceException e) {
             Throwable cause = e.getCause();
 

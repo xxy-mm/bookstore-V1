@@ -8,7 +8,7 @@ public interface UserDao {
      * insert a new user
      *
      * @param user the user to insert
-     * @return the generated user id
+     * @return the number of affected rows
      */
     long insert(User user);
 

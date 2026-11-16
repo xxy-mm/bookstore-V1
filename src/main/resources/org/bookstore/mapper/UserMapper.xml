@@ -23,7 +23,7 @@
     </sql>
     <insert id="insertUser" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO users (username, password, nickname, email, phone, role, status) VALUES (#{username}, #{password},
-        #{nickname} #{email}, #{phone}, #{role}, #{status});
+        #{nickname}, #{email}, #{phone}, #{role}, #{status});
     </insert>
     <select id="findByUsername" resultMap="userEntityMap">
         <include refid="select user entity"/>
