@@ -26,11 +26,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public long register(String username, String password, String nickname, String email, String phone) {
 
-        String usernameValidated = normalizeAndValidateUsername(username);
+        String usernameValidated = validateUsername(username);
         String passwordHashed = PasswordUtil.hashPassword(password);
-        String nicknameValidated = normalizeAndValidateOptional(nickname, OPTIONAL_MAX_LENGTH, "nickname");
-        String emailValidated = normalizeAndValidateOptional(email, OPTIONAL_MAX_LENGTH, "email");
-        String phoneValidated = normalizeAndValidateOptional(phone, OPTIONAL_MAX_LENGTH, "phone");
+        String nicknameValidated = validateOptional(nickname, "nickname");
+        String emailValidated = validateOptional(email, "email");
+        String phoneValidated = validateOptional(phone, "phone");
 
         User user = new User();
         user.setUsername(usernameValidated);
@@ -41,11 +41,14 @@ public class UserServiceImpl implements UserService {
         user.setRole(DEFAULT_ROLE);
         user.setStatus(DEFAULT_STATUS);
 
-        boolean exists = userDao.existsByUsername(user.getUsername());
+        // first check duplication, to check the username
+        boolean exists = userDao.findByUsername(user.getUsername()) != null;
         if (exists) {
             throw new UsernameAlreadyExistsException(user.getUsername());
         }
         try {
+            // even we checked above,the username still maybe inserted just before the following code executes.
+            // so we may still encounter a duplicate key exception.
             return this.userDao.insert(user);
         } catch (DuplicateKeyException e) {
             throw new UsernameAlreadyExistsException(user.getUsername());
@@ -55,14 +58,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO login(String username, String password) {
 
-        User user =
-                this.userDao.findByUsername(username).orElseThrow(() -> new InvalidCredentialsException("User " + 
-                        "not found."));
-        if (user.getStatus() != USER_STATUS_ACTIVE) {
-            throw new InvalidCredentialsException("The user is disabled.");
-        }
-        if (!PasswordUtil.verifyPassword(password, user.getPassword())) {
-            throw new InvalidCredentialsException("Password does not match");
+        User user = this.userDao.findByUsername(username);
+        if (user == null || user.getStatus() != USER_STATUS_ACTIVE || !PasswordUtil.verifyPassword(password,
+                user.getPassword())) {
+            throw new InvalidCredentialsException("Invalid username and password");
         }
 
         UserDTO userDto = new UserDTO();
@@ -73,32 +72,18 @@ public class UserServiceImpl implements UserService {
         return userDto;
     }
 
-    private String normalizeAndValidateUsername(String username) {
+    private String validateUsername(String username) {
 
-        if (username == null) {
-            throw new IllegalArgumentException("Username must not be null");
-        }
-        username = username.trim();
-        if (username.isEmpty()) {
-            throw new IllegalArgumentException("Username must not be empty");
-        }
         if (username.length() > USERNAME_MAX_LENGTH) {
             throw new IllegalArgumentException("Username must not exceeds " + USERNAME_MAX_LENGTH + "characters");
         }
         return username;
     }
 
-    private String normalizeAndValidateOptional(String value, int maxLength, String fieldName) {
+    private String validateOptional(String value, String fieldName) {
 
-        if (value == null) {
-            return null;
-        }
-        value = value.trim();
-        if (value.isEmpty()) {
-            return null;
-        }
-        if (value.length() > maxLength) {
-            throw new IllegalArgumentException(fieldName + " must not exceeds " + maxLength + "characters.");
+        if (value.length() > OPTIONAL_MAX_LENGTH) {
+            throw new IllegalArgumentException(fieldName + " must not exceeds " + OPTIONAL_MAX_LENGTH + "characters.");
         }
         return value;
     }
