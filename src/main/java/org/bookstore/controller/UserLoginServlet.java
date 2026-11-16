@@ -5,6 +5,8 @@ import org.bookstore.dto.UserDTO;
 import org.bookstore.exception.InvalidCredentialsException;
 import org.bookstore.service.UserService;
 import org.bookstore.service.impl.UserServiceImpl;
+import org.bookstore.util.CsrfTokenUtil;
+import org.bookstore.util.RequestParamUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -13,26 +15,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.SecureRandom;
-import java.util.Base64;
 
 @WebServlet("/user/login")
 public class UserLoginServlet extends HttpServlet {
 
-    private static final String CSRF_SESSION_ATTRIBUTE = "csrfToken";
-    private static final String CSRF_REQUEST_PARAMETER = "csrfToken";
-    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
     private final UserService userService = new UserServiceImpl(new UserDaoImpl());
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        HttpSession session = req.getSession();
-        if (session.getAttribute(CSRF_SESSION_ATTRIBUTE) == null) {
-            session.setAttribute(CSRF_SESSION_ATTRIBUTE, generateCsrfToken());
-        }
+        CsrfTokenUtil.addCsrfTokenToSession(req);
 
         req.getRequestDispatcher("/WEB-INF/view/user/login.jsp").forward(req, resp);
     }
@@ -41,15 +33,15 @@ public class UserLoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         req.setCharacterEncoding("UTF-8");
-        if (!isValidCsrfToken(req)) {
+        if (!CsrfTokenUtil.isValidCsrfToken(req)) {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
 
-        String username = req.getParameter("username");
-        String password = req.getParameter("password");
+        String username = RequestParamUtil.trimToNull(req.getParameter("username"));
+        String password = RequestParamUtil.trimToNull(req.getParameter("password"));
 
-        if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
+        if (username == null || password == null) {
             req.setAttribute("errorMsg", "Username or password is incorrect.");
             req.getRequestDispatcher("/WEB-INF/view/user/login.jsp").forward(req, resp);
             return;
@@ -62,7 +54,7 @@ public class UserLoginServlet extends HttpServlet {
 
             HttpSession session = req.getSession(false);
             session.setAttribute("user", user);
-            session.setAttribute(CSRF_SESSION_ATTRIBUTE, generateCsrfToken());
+            session.setAttribute(CsrfTokenUtil.CSRF_SESSION_ATTRIBUTE, CsrfTokenUtil.generateCsrfToken());
 
             resp.sendRedirect(req.getContextPath() + "/index.jsp");
 
@@ -73,29 +65,4 @@ public class UserLoginServlet extends HttpServlet {
         }
     }
 
-    private String generateCsrfToken() {
-
-        byte[] bytes = new byte[32];
-        SECURE_RANDOM.nextBytes(bytes);
-
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
-    }
-
-    private boolean isValidCsrfToken(HttpServletRequest req) {
-
-        HttpSession session = req.getSession(false);
-        if (session == null) {
-            return false;
-        }
-
-        String tokenFromSession = (String) session.getAttribute(CSRF_SESSION_ATTRIBUTE);
-        String tokenFromRequest = req.getParameter(CSRF_REQUEST_PARAMETER);
-
-        if (tokenFromSession == null || tokenFromRequest == null) {
-            return false;
-        }
-
-        return MessageDigest.isEqual(tokenFromRequest.getBytes(StandardCharsets.UTF_8),
-                tokenFromSession.getBytes(StandardCharsets.UTF_8));
-    }
 }
