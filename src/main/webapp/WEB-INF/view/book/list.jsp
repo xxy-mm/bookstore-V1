@@ -16,8 +16,8 @@
 
 <p>
     总记录数：${requestScope.pageResult.totalRecords}
-    当前页：${requestScope.pageNum}
-    总页数：${requestScope.totalPages}
+    当前页：${requestScope.pageResult.pageNum}
+    总页数：${requestScope.pageResult.totalPages}
 </p>
 
 <table class="table">
@@ -33,7 +33,7 @@
 
     <tbody>
 
-    <c:forEach items="${requestScope.list}" var="book">
+    <c:forEach items="${requestScope.pageResult.list}" var="book">
         <tr>
             <td>${book.id}</td>
             <td><a href="${pageContext.request.contextPath}/book/detail?id=${book.id}">
@@ -49,7 +49,7 @@
         </tr>
     </c:forEach>
 
-    <c:if test="${empty requestScope.list}">
+    <c:if test="${empty requestScope.pageResult.list}">
         <tr>
             <td colspan="5">暂无图书</td>
         </tr>
@@ -64,9 +64,9 @@
             <ul class="pagination">
                 <!-- pre -->
                 <c:choose>
-                    <c:when test="${requestScope.pageNum > 1}">
+                    <c:when test="${requestScope.pageResult.pageNum > 1}">
                         <li class="page-item"><a
-                                href="${pageContext.request.contextPath}/books?pageNum=${requestScope.pageNum - 1}&pageSize=${requestScope.pageSize}&category=${requestScope.categoryId}"
+                                href="${pageContext.request.contextPath}/books?pageNum=${requestScope.pageResult.pageNum - 1}&pageSize=${requestScope.pageResult.pageSize}&category=${requestScope.categoryId}"
                                 class="page-link">Previous</a></li>
                     </c:when>
                     <c:otherwise>
@@ -74,25 +74,25 @@
                     </c:otherwise>
                 </c:choose>
                 <!-- page -->
-                <c:forEach begin="1" end="${requestScope.totalPages}" var="i">
+                <c:forEach begin="1" end="${requestScope.pageResult.totalPages}" var="i">
                     <c:choose>
-                        <c:when test="${i==requestScope.pageNum}">
+                        <c:when test="${i==requestScope.pageResult.pageNum}">
                             <li class="page-item active">
                                 <span class="page-link">${i}</span>
                             </li>
                         </c:when>
                         <c:otherwise>
                             <li class="page-item"><a class="page-link"
-                                                     href="${pageContext.request.contextPath}/books?pageNum=${i}&pageSize=${requestScope.pageSize}&category=${requestScope.categoryId}">${i}</a>
+                                                     href="${pageContext.request.contextPath}/books?pageNum=${i}&pageSize=${requestScope.pageResult.pageSize}&category=${requestScope.categoryId}">${i}</a>
                             </li>
                         </c:otherwise>
                     </c:choose>
                 </c:forEach>
                 <!-- next -->
                 <c:choose>
-                    <c:when test="${requestScope.pageNum < requestScope.totalPages}">
+                    <c:when test="${requestScope.pageResult.pageNum < requestScope.pageResult.totalPages}">
                         <li class="page-item"><a
-                                href="${pageContext.request.contextPath}/books?pageNum=${requestScope.pageNum + 1}&pageSize=${requestScope.pageSize}&category=${requestScope.categoryId}"
+                                href="${pageContext.request.contextPath}/books?pageNum=${requestScope.pageResult.pageNum + 1}&pageSize=${requestScope.pageResult.pageSize}&category=${requestScope.categoryId}"
                                 class="page-link">Next</a></li>
                     </c:when>
                     <c:otherwise>
@@ -113,21 +113,21 @@
                     <div class="sm:col-2">
                         <select name="pageSize" id="pageSize" class="form-control form-control-sm"
                                 onchange="this.form.submit()">
-                            <option value="5" <c:if test="${requestScope.pageSize == 5}">selected</c:if>>
+                            <option value="5" <c:if test="${requestScope.pageResult.pageSize == 5}">selected</c:if>>
                                 5 条
                             </option>
                             <option value="10"
-                                    <c:if test="${requestScope.pageSize == 10}">selected</c:if>
+                                    <c:if test="${requestScope.pageResult.pageSize == 10}">selected</c:if>
                             >
                                 10 条
                             </option>
                             <option value="20"
-                                    <c:if test="${requestScope.pageSize == 20}">selected</c:if>
+                                    <c:if test="${requestScope.pageResult.pageSize == 20}">selected</c:if>
                             >
                                 20 条
                             </option>
                             <option value="50"
-                                    <c:if test="${requestScope.pageSize == 50}">selected</c:if>
+                                    <c:if test="${requestScope.pageResult.pageSize == 50}">selected</c:if>
                             >
                                 50 条
                             </option>

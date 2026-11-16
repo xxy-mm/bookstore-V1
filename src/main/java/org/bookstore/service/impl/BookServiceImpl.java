@@ -1,11 +1,13 @@
 package org.bookstore.service.impl;
 
 import org.bookstore.dao.BookDao;
-import org.bookstore.dto.BookListDTO;
+import org.bookstore.dto.BookDTO;
 import org.bookstore.dto.PageResult;
 import org.bookstore.entity.Book;
-import org.bookstore.exception.BookNotFoundException;
 import org.bookstore.service.BookService;
+import org.bookstore.util.PageUtil;
+
+import java.util.List;
 
 // handle business logic
 public class BookServiceImpl implements BookService {
@@ -18,21 +20,21 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public PageResult<BookListDTO> findByPage(int pageSize, int pageNum) {
-
-        return bookDao.findPage(pageSize, pageNum);
-    }
-
-    @Override
     public Book findById(long id) {
 
-        return bookDao.findById(id).orElseThrow(() -> new BookNotFoundException(id));
+        return bookDao.findById(id);
 
     }
 
     @Override
-    public PageResult<BookListDTO> findByPage(int pageSize, int pageNum, long categoryId) {
+    public PageResult<BookDTO> findByPage(long pageSize, long pageNum, Long categoryId) {
 
-        return bookDao.findPage(pageSize, pageNum, categoryId);
+        long count = bookDao.queryCountByCategoryId(categoryId);
+        PageResult<BookDTO> pageResult = PageUtil.getPageResult(pageSize, pageNum, count);
+        long offset = pageResult.getPageSize() * (pageResult.getPageNum() - 1);
+        List<BookDTO> list = bookDao.findByPage(pageSize, offset, categoryId);
+        pageResult.setList(list);
+        return pageResult;
     }
+
 }

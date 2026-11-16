@@ -8,6 +8,7 @@
     </settings>
     <typeAliases>
         <package name="org.bookstore.entity"/>
+        <package name="org.bookstore.dto"/>
     </typeAliases>
     <environments default="development">
         <environment id="development">

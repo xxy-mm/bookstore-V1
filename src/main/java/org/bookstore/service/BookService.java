@@ -1,29 +1,18 @@
 package org.bookstore.service;
 
-import org.bookstore.dto.BookListDTO;
+import org.bookstore.dto.BookDTO;
 import org.bookstore.dto.PageResult;
 import org.bookstore.entity.Book;
-import org.bookstore.exception.BookNotFoundException;
 
 public interface BookService {
-
-    /**
-     * find books by page
-     *
-     * @param pageSize the page size
-     * @param pageNum  the page number
-     * @return {@link PageResult} contains the books and related page information
-     */
-    PageResult<BookListDTO> findByPage(int pageSize, int pageNum);
 
     /**
      * find book by its id
      *
      * @param id the id of the book
      * @return the book
-     * @throws BookNotFoundException if the book doesn't exist
      */
     Book findById(long id);
 
-    PageResult<BookListDTO> findByPage(int pageSize, int pageNum, long categoryId);
+    PageResult<BookDTO> findByPage(long pageSize, long pageNum, Long categoryId);
 }

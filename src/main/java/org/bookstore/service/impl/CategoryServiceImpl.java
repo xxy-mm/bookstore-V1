@@ -8,6 +8,7 @@ import java.util.List;
 
 public class CategoryServiceImpl implements CategoryService {
 
+    private static final int CATEGORY_STATUS_ENABLED = 1;
     private final CategoryDao categoryDao;
 
     public CategoryServiceImpl(CategoryDao categoryDao) {
@@ -18,18 +19,20 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<Category> findAll() {
 
-        return this.categoryDao.findAll();
+        return this.categoryDao.findAll(null);
     }
 
     @Override
     public List<Category> findAllEnabled() {
 
-        return this.categoryDao.findAllEnabled();
+        return this.categoryDao.findAll(CATEGORY_STATUS_ENABLED);
     }
 
     @Override
     public boolean isEnabled(long categoryId) {
 
-        return this.categoryDao.isEnabled(categoryId);
+        Category category = this.categoryDao.findById(categoryId);
+
+        return category != null && category.getStatus() == CATEGORY_STATUS_ENABLED;
     }
 }

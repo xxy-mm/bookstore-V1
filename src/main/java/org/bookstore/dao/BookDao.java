@@ -1,29 +1,29 @@
 package org.bookstore.dao;
 
-import org.bookstore.dto.BookListDTO;
-import org.bookstore.dto.PageResult;
+import org.bookstore.dto.BookDTO;
 import org.bookstore.entity.Book;
 
-import java.util.Optional;
+import java.util.List;
 
 public interface BookDao {
 
     /**
-     * find the book specified by the provided id
+     * find a book by its id
      *
      * @param id the book's id
-     * @return an optional contains the book if found otherwise empty
+     * @return the book if found otherwise null
      */
-    Optional<Book> findById(long id);
+    Book findById(long id);
+
+    List<BookDTO> findByPage(long limit, long offset, Long categoryId);
 
     /**
-     * find books by page
+     * get the total count of books in the specified category id
+     * if category id is null, get the total count of all books, regardless of their category.
      *
-     * @param pageSize the number of records expected to get
-     * @param pageNum  the page number
-     * @return a PageResult object contains the records and page related information
+     * @param categoryId the book's category id or null
+     * @return the total count
      */
-    PageResult<BookListDTO> findPage(int pageSize, int pageNum);
-
-    PageResult<BookListDTO> findPage(int pageSize, int pageNum, long categoryId);
+    long queryCountByCategoryId(Long categoryId);
+    
 }

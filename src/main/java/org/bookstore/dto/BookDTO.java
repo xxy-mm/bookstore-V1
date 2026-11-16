@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Setter
 @Getter
 @NoArgsConstructor
-public class BookListDTO {
+public class BookDTO {
 
     private Long id;
     private String author;

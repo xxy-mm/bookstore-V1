@@ -9,20 +9,50 @@
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
     </resultMap>
-    <sql id="select books with category name">
-        select books.id, books.category_id, books.title, books.author, books.publisher, books.isbn, books.cover,
-        books.price, books.stock, books.description,
-        books.status from books join categories on books.category_id = categories.id
+
+    <sql id="join books and categories">
+        from books join categories on books.category_id = categories.id
+    </sql>
+    <sql id="select book entity">
+        select books.id,
+        books.category_id,
+        books.title,
+        books.author,
+        books.publisher,
+        books.isbn,
+        books.cover,
+        books.price,
+        books.stock,
+        books.description,
+        books.status
+        <include refid="join books and categories"/>
+    </sql>
+    <sql id="select book dto">
+        select books.id, books.author, books.title, books.price, books.cover, categories.name as categoryName
+        <include refid="join books and categories"/>
     </sql>
     <select id="findById" resultMap="bookResultMap">
-        <include refid="select books with category name"/>
+        <include refid="select book dto"/>
         where books.id = #{id}
     </select>
     <select id="findAll" resultMap="bookResultMap">
-        <include refid="select books with category name"/>
+        <include refid="select book dto"/>
     </select>
-    <select id="findAllByCategory" resultType="org.bookstore.entity.Book">
-        <include refid="select books with category name"/>
-        where category_id = #{categoryId}
+    <select id="findAllByCategory" resultType="bookDTO">
+        <include refid="select book dto"/>
+        <where>
+            <if test="categoryId!=null">
+                category_id = #{categoryId}
+            </if>
+        </where>
+        order by books.id limit #{limit} offset #{offset}
+    </select>
+    <select id="queryCountByCategoryId" resultType="java.lang.Long">
+        select count(*) from books
+        <where>
+            <if test="categoryId != null">
+                books.category_id = #{categoryId}
+            </if>
+        </where>
     </select>
 </mapper>

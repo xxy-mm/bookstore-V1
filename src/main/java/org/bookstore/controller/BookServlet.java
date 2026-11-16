@@ -2,9 +2,9 @@ package org.bookstore.controller;
 
 import org.bookstore.dao.impl.BookDaoImpl;
 import org.bookstore.entity.Book;
-import org.bookstore.exception.BookNotFoundException;
 import org.bookstore.service.BookService;
 import org.bookstore.service.impl.BookServiceImpl;
+import org.bookstore.util.RequestParamUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -21,36 +21,20 @@ public class BookServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        String idParam = req.getParameter("id");
+        Long id = RequestParamUtil.getLongValue(req.getParameter("id"));
 
-        if (idParam == null || idParam.trim().isEmpty()) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-
-        }
-
-        long id;
-
-        try {
-            id = Long.parseLong(idParam);
-        } catch (NumberFormatException e) {
+        if (id == null || id <= 0) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
-        if (id <= 0) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
-
-        try {
-            Book book = bookService.findById(id);
-
-            req.setAttribute("book", book);
-            req.getRequestDispatcher("/WEB-INF/view/book/detail.jsp").forward(req, resp);
-        } catch (BookNotFoundException e) {
+        Book book = bookService.findById(id);
+        if (book == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
         }
+        req.setAttribute("book", book);
+        req.getRequestDispatcher("/WEB-INF/view/book/detail.jsp").forward(req, resp);
 
     }
 }

@@ -12,8 +12,8 @@ import java.util.List;
 public class PageResult<T> {
 
     private List<T> list;
-    private Integer totalPages;
+    private Long totalPages;
     private Long totalRecords;
-    private Integer pageNum;
-    private Integer pageSize;
+    private Long pageNum;
+    private Long pageSize;
 }
