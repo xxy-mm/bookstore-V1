@@ -1,4 +1,3 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <!DOCTYPE html>
@@ -7,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <title>图书列表</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/bootstrap.min.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/bulma.min.css">
 </head>
 
 <body class="container">
