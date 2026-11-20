@@ -1,35 +1,38 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <html>
 <head>
+    <%@ include file="../common/statics.jsp" %>
     <title>User Login</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/bootstrap.min.css">
 </head>
-<body class="container">
-
-<h1>User Login</h1>
-
-<c:if test="${not empty requestScope.errorMsg}">
-    <div class="alert theme-danger" role="alert">
-        <p><c:out value="${requestScope.errorMsg}"/></p>
+<body>
+<section class="section">
+    <div class="container">
+        <h2 class="is-size-4 has-text-weight-bold is-flex is-justify-content-center is-align-items-center">Login</h2>
+        <c:if test="${not empty requestScope.errorMsg}">
+            <div class="notification is-danger">
+                <c:out value="${requestScope.errorMsg}"/>
+            </div>
+        </c:if>
+        <form method="post" action="${pageContext.request.contextPath}/login">
+            <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}">
+            <div class="field">
+                <label class="label" for="username">Username</label>
+                <div class="control">
+                    <input class="input" type="text" id="username" name="username">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label" for="password">Password</label>
+                <div class="control">
+                    <input class="input" type="password" id="password" name="password">
+                </div>
+            </div>
+            <div class="field">
+                <p>Don't have a username? <a href="${pageContext.request.contextPath}/register">Register here.</a></p>
+                <input type="submit" value="Login" class="is-link button is-float-right">
+            </div>
+        </form>
     </div>
-</c:if>
-
-<form action="${pageContext.request.contextPath}/user/login" method="post">
-    <input type="hidden" value="<c:out value='${sessionScope.csrfToken}'/>" name="csrfToken"/>
-    <div class="mb-3">
-        <label for="username" class="form-label">Username</label>
-        <input type="text" class="form-control" id="username" name="username" required maxlength="50"
-               autocomplete="username"
-               value="<c:out value='${requestScope.username}'/>">
-
-    </div>
-    <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
-        <input type="password" class="form-control" id="password" name="password" autocomplete="password"
-               required>
-
-    </div>
-    <button type="submit" class="btn-solid theme-primary">Login</button>
-</form>
+</section>
 </body>
 </html>
