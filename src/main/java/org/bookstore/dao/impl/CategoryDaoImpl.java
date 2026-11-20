@@ -28,4 +28,12 @@ public class CategoryDaoImpl implements CategoryDao {
         }
     }
 
+    @Override
+    public List<Category> selectChildren(long parentId) {
+        try (SqlSession sqlSession = MybatisUtil.openSession()) {
+            CategoryMapper mapper = sqlSession.getMapper(CategoryMapper.class);
+            return mapper.selectChildren(parentId);
+        }
+    }
+
 }

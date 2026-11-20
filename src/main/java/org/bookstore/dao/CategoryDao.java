@@ -23,4 +23,6 @@ public interface CategoryDao {
      * @return {@link List<Category>} all categories, or an empty list if none exist
      */
     List<Category> findAll(Integer status);
+
+    List<Category> selectChildren(long parentId);
 }

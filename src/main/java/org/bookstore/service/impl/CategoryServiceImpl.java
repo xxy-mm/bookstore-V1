@@ -35,4 +35,10 @@ public class CategoryServiceImpl implements CategoryService {
 
         return category != null && category.getStatus() == CATEGORY_STATUS_ENABLED;
     }
+
+    @Override
+    public List<Category> selectChildren(long parentId) {
+        List<Category> categories = this.categoryDao.selectChildren(parentId);
+        return categories;
+    }
 }

@@ -1,4 +1,4 @@
-package org.bookstore.controller;
+package org.bookstore.web.controller;
 
 import org.bookstore.dao.impl.BookDaoImpl;
 import org.bookstore.entity.Book;

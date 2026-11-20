@@ -4,12 +4,6 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.bookstore.mapper.BookMapper">
 
-    <resultMap id="bookResultMap" type="Book">
-        <result column="category_id" property="categoryId"/>
-        <result column="create_time" property="createTime"/>
-        <result column="update_time" property="updateTime"/>
-    </resultMap>
-
     <sql id="join books and categories">
         from books join categories on books.category_id = categories.id
     </sql>
@@ -31,18 +25,21 @@
         select books.id, books.author, books.title, books.price, books.cover, categories.name as categoryName
         <include refid="join books and categories"/>
     </sql>
-    <select id="findById" resultMap="bookResultMap">
+    <select id="findById" resultType="book">
         <include refid="select book dto"/>
         where books.id = #{id}
     </select>
-    <select id="findAll" resultMap="bookResultMap">
+    <select id="findAll" resultType="book">
         <include refid="select book dto"/>
     </select>
     <select id="findAllByCategory" resultType="bookDTO">
         <include refid="select book dto"/>
         <where>
-            <if test="categoryId!=null">
-                category_id = #{categoryId}
+            <if test="categoryIds!=null and categoryIds.size() > 0">
+                category_id in
+                <foreach collection="categoryIds" item="categoryId" open="(" close=")" separator=",">
+                    #{categoryId}
+                </foreach>
             </if>
         </where>
         order by books.id limit #{limit} offset #{offset}
@@ -50,8 +47,11 @@
     <select id="queryCountByCategoryId" resultType="java.lang.Long">
         select count(*) from books
         <where>
-            <if test="categoryId != null">
-                books.category_id = #{categoryId}
+            <if test="categoryIds != null and categoryIds.size() > 0">
+                category_id in
+                <foreach collection="categoryIds" separator="," close=")" open="(" item="categoryId">
+                    #{categoryId}
+                </foreach>
             </if>
         </where>
     </select>

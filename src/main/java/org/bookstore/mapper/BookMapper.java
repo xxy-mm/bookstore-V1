@@ -13,7 +13,7 @@ public interface BookMapper {
     List<Book> findAll();
 
     List<BookDTO> findAllByCategory(@Param("limit") Long limit, @Param("offset") Long offset,
-                                    @Param("categoryId") Long categoryId);
-    
-    long queryCountByCategoryId(Long categoryId);
+                                    @Param("categoryIds") List<Long> categoryId);
+
+    long queryCountByCategoryId(@Param("categoryIds") List<Long> categoryId);
 }

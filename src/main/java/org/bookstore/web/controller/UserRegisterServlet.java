@@ -1,5 +1,11 @@
-package org.bookstore.controller;
+package org.bookstore.web.controller;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.bookstore.dao.impl.UserDaoImpl;
 import org.bookstore.exception.UsernameAlreadyExistsException;
 import org.bookstore.service.UserService;
@@ -8,30 +14,30 @@ import org.bookstore.util.CsrfTokenUtil;
 import org.bookstore.util.PasswordUtil;
 import org.bookstore.util.RequestParamUtil;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet("/user/register")
+@WebServlet("/register")
 public class UserRegisterServlet extends HttpServlet {
 
     private final UserService userService = new UserServiceImpl(new UserDaoImpl());
+    private final String SUCCESS_MSG_ATTRIBUTE_KEY = "successMsg";
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        HttpSession session = req.getSession();
 
-        CsrfTokenUtil.addCsrfTokenToSession(req);
+        Object successMsg = session.getAttribute(SUCCESS_MSG_ATTRIBUTE_KEY);
+        if (successMsg != null) {
+            req.setAttribute(SUCCESS_MSG_ATTRIBUTE_KEY, successMsg);
+            session.removeAttribute(SUCCESS_MSG_ATTRIBUTE_KEY);
+        } else {
+            CsrfTokenUtil.addCsrfTokenToSession(req);
+        }
         req.getRequestDispatcher("/WEB-INF/view/user/register.jsp").forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
-        req.setCharacterEncoding("UTF-8");
-
         if (!CsrfTokenUtil.isValidCsrfToken(req)) {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
@@ -48,9 +54,13 @@ public class UserRegisterServlet extends HttpServlet {
             if (!PasswordUtil.passwordsMatch(password, confirmPassword)) {
                 throw new IllegalArgumentException("Password does not match");
             }
+            if (username == null) {
+                throw new IllegalArgumentException("Please input the username.");
+            }
 
             userService.register(username, password, nickname, email, phone);
-            resp.sendRedirect(resp.encodeRedirectURL("/login.jsp"));
+            req.getSession().setAttribute("successMsg", "Registration Successful! ");
+            resp.sendRedirect(req.getContextPath() + "/register");
         } catch (UsernameAlreadyExistsException | IllegalArgumentException e) {
             forwardWithError(req, resp, e.getMessage(), username, nickname, email, phone);
         }

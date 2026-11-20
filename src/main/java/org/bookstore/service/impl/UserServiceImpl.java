@@ -82,7 +82,7 @@ public class UserServiceImpl implements UserService {
 
     private String validateOptional(String value, String fieldName) {
 
-        if (value.length() > OPTIONAL_MAX_LENGTH) {
+        if (value != null && value.length() > OPTIONAL_MAX_LENGTH) {
             throw new IllegalArgumentException(fieldName + " must not exceeds " + OPTIONAL_MAX_LENGTH + "characters.");
         }
         return value;

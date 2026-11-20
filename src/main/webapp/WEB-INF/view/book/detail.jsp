@@ -3,8 +3,8 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <title><c:out value="${requestScope.book.title}"/> - 图书详情</title>
+    <%@ include file="../common/statics.jsp" %>
+    <title>Book Detail</title>
 </head>
 <body>
 <h1><c:out value="${requestScope.book.title}"/></h1>

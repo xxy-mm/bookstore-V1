@@ -30,4 +30,6 @@ public interface CategoryService {
      * @return true if enabled, false if not.
      */
     boolean isEnabled(long categoryId);
+
+    List<Category> selectChildren(long parentId);
 }

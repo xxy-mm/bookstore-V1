@@ -1,5 +1,11 @@
-package org.bookstore.controller;
+package org.bookstore.web.controller;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.bookstore.dao.impl.UserDaoImpl;
 import org.bookstore.dto.UserDTO;
 import org.bookstore.exception.InvalidCredentialsException;
@@ -8,15 +14,9 @@ import org.bookstore.service.impl.UserServiceImpl;
 import org.bookstore.util.CsrfTokenUtil;
 import org.bookstore.util.RequestParamUtil;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
-@WebServlet("/user/login")
+@WebServlet("/login")
 public class UserLoginServlet extends HttpServlet {
 
     private final UserService userService = new UserServiceImpl(new UserDaoImpl());
@@ -31,8 +31,6 @@ public class UserLoginServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
-        req.setCharacterEncoding("UTF-8");
         if (!CsrfTokenUtil.isValidCsrfToken(req)) {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
@@ -42,7 +40,7 @@ public class UserLoginServlet extends HttpServlet {
         String password = RequestParamUtil.trimToNull(req.getParameter("password"));
 
         if (username == null || password == null) {
-            req.setAttribute("errorMsg", "Username or password is incorrect.");
+            req.setAttribute("errorMsg", "Invalid username or password.");
             req.getRequestDispatcher("/WEB-INF/view/user/login.jsp").forward(req, resp);
             return;
         }
@@ -59,7 +57,7 @@ public class UserLoginServlet extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/index.jsp");
 
         } catch (InvalidCredentialsException e) {
-            req.setAttribute("errorMsg", "Username or password is incorrect.");
+            req.setAttribute("errorMsg", "Invalid username or password.");
             req.setAttribute("username", username);
             req.getRequestDispatcher("/WEB-INF/view/user/login.jsp").forward(req, resp);
         }

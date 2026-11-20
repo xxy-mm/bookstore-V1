@@ -4,19 +4,13 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.bookstore.mapper.CategoryMapper">
 
-    <resultMap id="categoryResultMap" type="Category">
-        <result column="parent_id" property="parentId"/>
-        <result column="create_time" property="createTime"/>
-        <result column="update_time" property="updateTime"/>
-    </resultMap>
-
     <sql id="select category entity">
         select id, parent_id, name, sort, status, create_time, update_time
         from categories
     </sql>
 
 
-    <select id="findById" resultMap="categoryResultMap">
+    <select id="findById" resultType="category">
         <include refid="select category entity"/>
         where id = #{id} order by sort, id
     </select>
@@ -28,6 +22,10 @@
             </if>
         </where>
         order by sort, id
+    </select>
+    <select id="selectChildren" resultType="Category">
+        <include refid="select category entity"/>
+        where parent_id = #{parentId}
     </select>
 
 </mapper>
