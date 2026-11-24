@@ -1,20 +1,13 @@
 package org.bookstore.dto;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.math.BigDecimal;
+import org.bookstore.entity.Book;
 
 @Setter
 @Getter
-@NoArgsConstructor
-public class BookDTO {
+public class BookDTO extends Book {
 
-    private Long id;
-    private String author;
-    private String title;
-    private BigDecimal price;
-    private String cover;
     private String categoryName;
+
 }

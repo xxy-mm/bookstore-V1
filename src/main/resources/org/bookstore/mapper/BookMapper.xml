@@ -22,10 +22,20 @@
         <include refid="join books and categories"/>
     </sql>
     <sql id="select book dto">
-        select books.id, books.author, books.title, books.price, books.cover, categories.name as categoryName
+        select books.id,
+        books.category_id,
+        books.title,
+        books.author,
+        books.publisher,
+        books.isbn,
+        books.cover,
+        books.price,
+        books.stock,
+        books.description,
+        books.status, categories.name as categoryName
         <include refid="join books and categories"/>
     </sql>
-    <select id="findById" resultType="book">
+    <select id="findById" resultType="bookDTO">
         <include refid="select book dto"/>
         where books.id = #{id}
     </select>
@@ -36,10 +46,14 @@
         <include refid="select book dto"/>
         <where>
             <if test="categoryIds!=null and categoryIds.size() > 0">
-                category_id in
+                and category_id in
                 <foreach collection="categoryIds" item="categoryId" open="(" close=")" separator=",">
                     #{categoryId}
                 </foreach>
+            </if>
+
+            <if test="true">
+                and categories.status = 1
             </if>
         </where>
         order by books.id limit #{limit} offset #{offset}
@@ -48,7 +62,7 @@
         select count(*) from books
         <where>
             <if test="categoryIds != null and categoryIds.size() > 0">
-                category_id in
+                and category_id in
                 <foreach collection="categoryIds" separator="," close=")" open="(" item="categoryId">
                     #{categoryId}
                 </foreach>

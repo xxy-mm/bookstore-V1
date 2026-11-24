@@ -2,10 +2,9 @@ package org.bookstore.service.impl;
 
 import org.bookstore.dao.BookDao;
 import org.bookstore.dto.BookDTO;
+import org.bookstore.dto.BookPageQuery;
 import org.bookstore.dto.PageResult;
-import org.bookstore.entity.Book;
 import org.bookstore.service.BookService;
-import org.bookstore.util.PageUtil;
 
 import java.util.List;
 
@@ -20,19 +19,21 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Book findById(long id) {
+    public BookDTO findById(long id) {
 
         return bookDao.findById(id);
 
     }
 
     @Override
-    public PageResult<BookDTO> findByPage(long pageSize, long pageNum, Long categoryId) {
+    public PageResult<BookDTO> findByPage(BookPageQuery query) {
 
-        long count = bookDao.queryCountByCategoryId(categoryId);
-        PageResult<BookDTO> pageResult = PageUtil.getPageResult(pageSize, pageNum, count);
-        long offset = pageResult.getPageSize() * (pageResult.getPageNum() - 1);
-        List<BookDTO> list = bookDao.findByPage(pageSize, offset, categoryId);
+        long count = bookDao.queryCountByCategoryId(query.getCategoryId());
+        PageResult<BookDTO> pageResult =
+                PageResult.create(query, count);
+
+        List<BookDTO> list = bookDao.findByPage(pageResult.getPageSize(),
+                pageResult.getOffset(), query.getCategoryId());
         pageResult.setList(list);
         return pageResult;
     }

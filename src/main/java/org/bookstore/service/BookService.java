@@ -1,8 +1,8 @@
 package org.bookstore.service;
 
 import org.bookstore.dto.BookDTO;
+import org.bookstore.dto.BookPageQuery;
 import org.bookstore.dto.PageResult;
-import org.bookstore.entity.Book;
 
 public interface BookService {
 
@@ -12,7 +12,8 @@ public interface BookService {
      * @param id the id of the book
      * @return the book
      */
-    Book findById(long id);
+    BookDTO findById(long id);
 
-    PageResult<BookDTO> findByPage(long pageSize, long pageNum, Long categoryId);
+    PageResult<BookDTO> findByPage(BookPageQuery query);
+
 }

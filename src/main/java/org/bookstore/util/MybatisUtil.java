@@ -10,13 +10,14 @@ import java.io.InputStream;
 
 public class MybatisUtil {
 
+    private static final String RESOURCE_URL = "mybatis-config.xml";
+
     private static final SqlSessionFactory sqlSessionFactory;
 
     static {
-        String resource = "mybatis-config.xml";
-        InputStream inputStream = null;
+        InputStream inputStream;
         try {
-            inputStream = Resources.getResourceAsStream(resource);
+            inputStream = Resources.getResourceAsStream(RESOURCE_URL);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

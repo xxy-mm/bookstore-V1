@@ -1,7 +1,6 @@
 package org.bookstore.dao;
 
 import org.bookstore.dto.BookDTO;
-import org.bookstore.entity.Book;
 
 import java.util.List;
 
@@ -13,7 +12,7 @@ public interface BookDao {
      * @param id the book's id
      * @return the book if found otherwise null
      */
-    Book findById(long id);
+    BookDTO findById(long id);
 
     List<BookDTO> findByPage(long limit, long offset, Long categoryId);
 
@@ -25,5 +24,5 @@ public interface BookDao {
      * @return the total count
      */
     long queryCountByCategoryId(Long categoryId);
-    
+
 }

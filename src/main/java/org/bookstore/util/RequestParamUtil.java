@@ -25,7 +25,7 @@ public final class RequestParamUtil {
         return value.isEmpty() ? null : value;
     }
 
-    public static Integer getIntValue(String value) {
+    public static Integer getInteger(String value) {
 
         value = trimToNull(value);
         if (value == null) {
@@ -38,7 +38,7 @@ public final class RequestParamUtil {
         }
     }
 
-    public static Long getLongValue(String value) {
+    public static Long getLong(String value) {
 
         value = trimToNull(value);
         if (value == null) {

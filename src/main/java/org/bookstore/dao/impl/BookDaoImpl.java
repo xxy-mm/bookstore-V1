@@ -3,7 +3,6 @@ package org.bookstore.dao.impl;
 import org.apache.ibatis.session.SqlSession;
 import org.bookstore.dao.BookDao;
 import org.bookstore.dto.BookDTO;
-import org.bookstore.entity.Book;
 import org.bookstore.entity.Category;
 import org.bookstore.mapper.BookMapper;
 import org.bookstore.mapper.CategoryMapper;
@@ -16,7 +15,7 @@ import java.util.List;
 public class BookDaoImpl implements BookDao {
 
     @Override
-    public Book findById(long id) {
+    public BookDTO findById(long id) {
 
         try (SqlSession sqlSession = MybatisUtil.openSession()) {
             BookMapper bookMapper = sqlSession.getMapper(BookMapper.class);
