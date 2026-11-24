@@ -1,21 +1,23 @@
 package org.bookstore.web.controller;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.bookstore.dao.impl.BookDaoImpl;
 import org.bookstore.dao.impl.CategoryDaoImpl;
 import org.bookstore.dto.BookDTO;
+import org.bookstore.dto.BookPageQuery;
 import org.bookstore.dto.PageResult;
 import org.bookstore.entity.Category;
+import org.bookstore.exception.InvalidRequestParameterException;
 import org.bookstore.service.BookService;
 import org.bookstore.service.CategoryService;
 import org.bookstore.service.impl.BookServiceImpl;
 import org.bookstore.service.impl.CategoryServiceImpl;
 import org.bookstore.util.RequestParamUtil;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
@@ -23,46 +25,36 @@ import java.util.List;
 @WebServlet("/books")
 public class BookListServlet extends HttpServlet {
 
-    private static final long DEFAULT_PAGE_NUM = 1;
-    private static final long DEFAULT_PAGE_SIZE = 5;
-    private static final long MIN_PAGE_SIZE = 5;
-    private static final long MAX_PAGE_SIZE = 50;
-
     private final BookService bookService = new BookServiceImpl(new BookDaoImpl());
     private final CategoryService categoryService = new CategoryServiceImpl(new CategoryDaoImpl());
-
-    private static long getPageSize(HttpServletRequest req) {
-
-        Long pageSize = RequestParamUtil.getLongValue(req.getParameter("pageSize"));
-        long pageSizeValue = pageSize == null ? DEFAULT_PAGE_SIZE : pageSize;
-        return Math.max(MIN_PAGE_SIZE, Math.min(MAX_PAGE_SIZE, pageSizeValue));
-    }
-
-    private static long getPageNum(HttpServletRequest req) {
-
-        Long pageNum = RequestParamUtil.getLongValue(req.getParameter("pageNum"));
-        long pageNumValue = pageNum == null ? DEFAULT_PAGE_NUM : pageNum;
-        return Math.max(1, pageNumValue);
-    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        long pageSize = getPageSize(req);
-        long pageNum = getPageNum(req);
-        Long categoryId = RequestParamUtil.getLongValue(req.getParameter("category"));
-
-        if (categoryId != null && (categoryId <= 0 || !categoryService.isEnabled(categoryId))) {
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+        Integer pageSize;
+        Integer pageNum;
+        Long categoryId;
+        try {
+            pageSize = RequestParamUtil.getInteger(req.getParameter("pageSize"));
+            pageNum = RequestParamUtil.getInteger(req.getParameter("pageNum"));
+            categoryId = RequestParamUtil.getLong(req.getParameter("category"));
+        } catch (InvalidRequestParameterException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
+        BookPageQuery bpq = new BookPageQuery();
+        bpq.setCategoryId(categoryId);
+        bpq.setPageNum(pageNum);
+        bpq.setPageSize(pageSize);
+
         List<Category> categories = categoryService.findAllEnabled();
-        PageResult<BookDTO> pageResult = bookService.findByPage(pageSize, pageNum, categoryId);
+        PageResult<BookDTO> pageResult = bookService.findByPage(bpq);
         req.setAttribute("pageResult", pageResult);
         req.setAttribute("categories", categories);
         req.setAttribute("categoryId", categoryId);
         req.getRequestDispatcher("/WEB-INF/view/book/list.jsp").forward(req, resp);
 
     }
+
 }
