@@ -15,14 +15,14 @@ public class MybatisUtil {
     private static final SqlSessionFactory sqlSessionFactory;
 
     static {
-        InputStream inputStream;
-        try {
-            inputStream = Resources.getResourceAsStream(RESOURCE_URL);
+
+        try (InputStream inputStream = Resources.getResourceAsStream(RESOURCE_URL)) {
+            sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
 
     }
 
