@@ -18,28 +18,9 @@
         }
     </style>
 </head>
-<body class="has-background-light">
+<body>
 
-<!-- Top Navigation -->
-<nav class="navbar is-white has-shadow" role="navigation" aria-label="main navigation">
-    <div class="container">
-        <div class="navbar-brand">
-            <a class="navbar-item has-text-weight-bold is-size-4 has-text-link"
-               href="${pageContext.request.contextPath}/books">
-                <span class="icon mr-1"><i class="fas fa-book-open"></i></span>
-                <span>BookStore</span>
-            </a>
-        </div>
-        <div class="navbar-end">
-            <div class="navbar-item">
-                <a class="button is-light" href="${pageContext.request.contextPath}/cart">
-                    <span class="icon"><i class="fas fa-shopping-cart"></i></span>
-                    <span>Cart</span>
-                </a>
-            </div>
-        </div>
-    </div>
-</nav>
+<%@include file="../common/navbar.jsp"%>
 
 <!-- Main Content -->
 <section class="section">

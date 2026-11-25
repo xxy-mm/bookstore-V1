@@ -6,7 +6,7 @@
 </head>
 <body>
 <section class="section">
-    <div class="container">
+    <div class="box">
         <h2 class="is-size-4 has-text-weight-bold is-flex is-justify-content-center is-align-items-center">Login</h2>
         <c:if test="${not empty requestScope.errorMsg}">
             <div class="notification is-danger">
@@ -28,8 +28,11 @@
                 </div>
             </div>
             <div class="field">
-                <p>Don't have a username? <a href="${pageContext.request.contextPath}/register">Register here.</a></p>
-                <input type="submit" value="Login" class="is-link button is-float-right">
+                <div class="is-flex is-justify-content-space-between">
+                    <p>Don't have a username? <a href="${pageContext.request.contextPath}/register">Register here.</a>
+                    </p>
+                    <input type="submit" value="Login" class="is-link button is-float-right">
+                </div>
             </div>
         </form>
     </div>

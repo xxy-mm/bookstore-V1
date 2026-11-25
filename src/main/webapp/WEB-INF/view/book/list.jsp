@@ -7,6 +7,8 @@
 </head>
 
 <body>
+<%@include file="/WEB-INF/view/common/navbar.jsp"%>
+
 <section class="section">
     <div class="container">
         <h1 class="title">Book List</h1>

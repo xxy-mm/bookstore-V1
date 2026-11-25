@@ -54,7 +54,7 @@ public class UserLoginServlet extends HttpServlet {
             session.setAttribute("loginUser", user);
             session.setAttribute(CsrfTokenUtil.CSRF_SESSION_ATTRIBUTE, CsrfTokenUtil.generateCsrfToken());
 
-            resp.sendRedirect(req.getContextPath() + "/index.jsp");
+            resp.sendRedirect(req.getContextPath() + "/books");
 
         } catch (InvalidCredentialsException e) {
             req.setAttribute("errorMsg", "Invalid username or password.");
