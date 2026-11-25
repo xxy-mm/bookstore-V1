@@ -51,7 +51,7 @@ public class UserLoginServlet extends HttpServlet {
             req.changeSessionId();
 
             HttpSession session = req.getSession(false);
-            session.setAttribute("user", user);
+            session.setAttribute("loginUser", user);
             session.setAttribute(CsrfTokenUtil.CSRF_SESSION_ATTRIBUTE, CsrfTokenUtil.generateCsrfToken());
 
             resp.sendRedirect(req.getContextPath() + "/index.jsp");
