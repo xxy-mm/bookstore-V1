@@ -8,13 +8,13 @@ import java.util.List;
 
 public interface BookMapper {
 
-    BookDTO findById(long id);
+    BookDTO selectById(Long id);
 
     List<Book> findAll();
 
-    List<BookDTO> findAllByCategory(@Param("limit") Long limit, @Param("offset") Long offset,
-                                    @Param("categoryIds") List<Long> categoryId);
+    List<BookDTO> selectPageByCategory(@Param("limit") Integer limit, @Param("offset") Long offset,
+                                       @Param("categoryId") Long categoryId);
 
-    long queryCountByCategoryId(@Param("categoryIds") List<Long> categoryId);
+    long selectCountByCategory(Long categoryId);
 
 }

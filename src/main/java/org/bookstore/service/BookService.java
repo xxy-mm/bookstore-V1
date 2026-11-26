@@ -12,8 +12,8 @@ public interface BookService {
      * @param id the id of the book
      * @return the book
      */
-    BookDTO findById(long id);
+    BookDTO selectById(Long id);
 
-    PageResult<BookDTO> findByPage(BookPageQuery query);
+    PageResult<BookDTO> selectByPage(BookPageQuery query);
 
 }

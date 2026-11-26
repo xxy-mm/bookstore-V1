@@ -5,8 +5,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.bookstore.dao.impl.BookDaoImpl;
-import org.bookstore.dao.impl.CategoryDaoImpl;
 import org.bookstore.dto.BookDTO;
 import org.bookstore.dto.BookPageQuery;
 import org.bookstore.dto.PageResult;
@@ -25,8 +23,8 @@ import java.util.List;
 @WebServlet("/books")
 public class BookListServlet extends HttpServlet {
 
-    private final BookService bookService = new BookServiceImpl(new BookDaoImpl());
-    private final CategoryService categoryService = new CategoryServiceImpl(new CategoryDaoImpl());
+    private final BookService bookService = new BookServiceImpl();
+    private final CategoryService categoryService = new CategoryServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -48,8 +46,8 @@ public class BookListServlet extends HttpServlet {
         bpq.setPageNum(pageNum);
         bpq.setPageSize(pageSize);
 
-        List<Category> categories = categoryService.findAllEnabled();
-        PageResult<BookDTO> pageResult = bookService.findByPage(bpq);
+        List<Category> categories = categoryService.selectAllEnabled();
+        PageResult<BookDTO> pageResult = bookService.selectByPage(bpq);
         req.setAttribute("pageResult", pageResult);
         req.setAttribute("categories", categories);
         req.setAttribute("categoryId", categoryId);

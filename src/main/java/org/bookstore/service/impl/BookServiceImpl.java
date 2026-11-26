@@ -1,41 +1,34 @@
 package org.bookstore.service.impl;
 
-import org.bookstore.dao.BookDao;
 import org.bookstore.dto.BookDTO;
 import org.bookstore.dto.BookPageQuery;
 import org.bookstore.dto.PageResult;
+import org.bookstore.mapper.BookMapper;
 import org.bookstore.service.BookService;
+import org.bookstore.util.MybatisUtil;
 
 import java.util.List;
 
 // handle business logic
 public class BookServiceImpl implements BookService {
 
-    private final BookDao bookDao;
-
-    public BookServiceImpl(BookDao bookDao) {
-
-        this.bookDao = bookDao;
+    @Override
+    public BookDTO selectById(Long id) {
+        return MybatisUtil.execute(BookMapper.class, bookMapper -> {
+            return bookMapper.selectById(id);
+        });
     }
 
     @Override
-    public BookDTO findById(long id) {
+    public PageResult<BookDTO> selectByPage(BookPageQuery query) {
 
-        return bookDao.findById(id);
-
-    }
-
-    @Override
-    public PageResult<BookDTO> findByPage(BookPageQuery query) {
-
-        long count = bookDao.queryCountByCategoryId(query.getCategoryId());
-        PageResult<BookDTO> pageResult =
-                PageResult.create(query, count);
-
-        List<BookDTO> list = bookDao.findByPage(pageResult.getPageSize(),
-                pageResult.getOffset(), query.getCategoryId());
-        pageResult.setList(list);
-        return pageResult;
+        return MybatisUtil.execute(BookMapper.class, bookMapper -> {
+            long total = bookMapper.selectCountByCategory(query.getCategoryId());
+            PageResult<BookDTO> pageResult = PageResult.create(query, total);
+            List<BookDTO> bookDTOS = bookMapper.selectPageByCategory(pageResult.getPageSize(), pageResult.getOffset(), pageResult.getTotalRecords());
+            pageResult.setList(bookDTOS);
+            return pageResult;
+        });
     }
 
 }

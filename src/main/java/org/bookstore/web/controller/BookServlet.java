@@ -5,7 +5,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.bookstore.dao.impl.BookDaoImpl;
 import org.bookstore.entity.Book;
 import org.bookstore.service.BookService;
 import org.bookstore.service.impl.BookServiceImpl;
@@ -16,7 +15,7 @@ import java.io.IOException;
 @WebServlet("/book/detail")
 public class BookServlet extends HttpServlet {
 
-    private final BookService bookService = new BookServiceImpl(new BookDaoImpl());
+    private final BookService bookService = new BookServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -28,7 +27,7 @@ public class BookServlet extends HttpServlet {
             return;
         }
 
-        Book book = bookService.findById(id);
+        Book book = bookService.selectById(id);
         if (book == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;

@@ -3,70 +3,79 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.bookstore.mapper.BookMapper">
-
-    <sql id="join books and categories">
-        from books join categories on books.category_id = categories.id
+    <sql id="category tree">
+        with recursive category_tree as (SELECT id
+                                         FROM categories
+                                         WHERE id = #{categoryId}
+                                           AND STATUS = 1
+                                         UNION ALL
+                                         SELECT c.id
+                                         FROM categories c
+                                                  INNER JOIN category_tree ct
+                                                             ON c.parent_id = ct.id
+                                         WHERE c.status = 1)
     </sql>
+
     <sql id="select book entity">
         select books.id,
-        books.category_id,
-        books.title,
-        books.author,
-        books.publisher,
-        books.isbn,
-        books.cover,
-        books.price,
-        books.stock,
-        books.description,
-        books.status
-        <include refid="join books and categories"/>
+               books.category_id,
+               books.title,
+               books.author,
+               books.publisher,
+               books.isbn,
+               books.cover,
+               books.price,
+               books.stock,
+               books.description,
+               books.status
+        from books
     </sql>
     <sql id="select book dto">
         select books.id,
-        books.category_id,
-        books.title,
-        books.author,
-        books.publisher,
-        books.isbn,
-        books.cover,
-        books.price,
-        books.stock,
-        books.description,
-        books.status, categories.name as categoryName
-        <include refid="join books and categories"/>
+               books.category_id,
+               books.title,
+               books.author,
+               books.publisher,
+               books.isbn,
+               books.cover,
+               books.price,
+               books.stock,
+               books.description,
+               books.status,
+               categories.name as categoryName
+        from books
+                 inner join categories on books.category_id = categories.id
     </sql>
-    <select id="findById" resultType="bookDTO">
+    <select id="selectById" resultType="bookDTO">
         <include refid="select book dto"/>
-        where books.id = #{id}
+        where books.id = #{id} and books.status = 1
     </select>
     <select id="findAll" resultType="book">
         <include refid="select book dto"/>
+        where books.status = 1
     </select>
-    <select id="findAllByCategory" resultType="bookDTO">
-        <include refid="select book dto"/>
-        <where>
-            <if test="categoryIds!=null and categoryIds.size() > 0">
-                and category_id in
-                <foreach collection="categoryIds" item="categoryId" open="(" close=")" separator=",">
-                    #{categoryId}
-                </foreach>
-            </if>
-
-            <if test="true">
-                and categories.status = 1
-            </if>
-        </where>
-        order by books.id limit #{limit} offset #{offset}
+    <select id="selectCountByCategory" resultType="long">
+        <include refid="category tree"/>
+        select count(*) from books b inner join category_tree ct on b.category_id = ct.id where b.status = 1
     </select>
-    <select id="queryCountByCategoryId" resultType="java.lang.Long">
-        select count(*) from books
-        <where>
-            <if test="categoryIds != null and categoryIds.size() > 0">
-                and category_id in
-                <foreach collection="categoryIds" separator="," close=")" open="(" item="categoryId">
-                    #{categoryId}
-                </foreach>
-            </if>
-        </where>
+    <select id="selectPageByCategory" resultType="BookDTO">
+        <include refid="category tree"/>
+        SELECT b.id,
+        b.category_id,
+        b.title,
+        b.author,
+        b.publisher,
+        b.isbn,
+        b.cover,
+        b.price,
+        b.stock,
+        b.description,
+        b.status,
+        b.create_time,
+        b.update_time
+        FROM books b
+        INNER JOIN category_tree ct ON b.category_id = ct.id
+        WHERE b.status = 1
+        ORDER BY b.id
     </select>
 </mapper>
