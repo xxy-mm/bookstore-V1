@@ -54,28 +54,47 @@
         <include refid="select book dto"/>
         where books.status = 1
     </select>
+
     <select id="selectCountByCategory" resultType="long">
-        <include refid="category tree"/>
-        select count(*) from books b inner join category_tree ct on b.category_id = ct.id where b.status = 1
+        <choose>
+            <when test="categoryId==null">
+                select count(*)
+                from books
+                where books.status = 1
+            </when>
+            <otherwise>
+                <include refid="category tree"/>
+                select count(*) from books b inner join category_tree ct on b.category_id = ct.id where b.status = 1
+            </otherwise>
+        </choose>
     </select>
     <select id="selectPageByCategory" resultType="BookDTO">
-        <include refid="category tree"/>
-        SELECT b.id,
-        b.category_id,
-        b.title,
-        b.author,
-        b.publisher,
-        b.isbn,
-        b.cover,
-        b.price,
-        b.stock,
-        b.description,
-        b.status,
-        b.create_time,
-        b.update_time
-        FROM books b
-        INNER JOIN category_tree ct ON b.category_id = ct.id
-        WHERE b.status = 1
-        ORDER BY b.id
+        <choose>
+            <when test="categoryId == null">
+                <include refid="select book dto"/>
+                where books.status = 1 order by books.id limit #{limit} offset #{offset}
+            </when>
+            <otherwise>
+                <include refid="category tree"/>
+                SELECT b.id,
+                b.category_id,
+                b.title,
+                b.author,
+                b.publisher,
+                b.isbn,
+                b.cover,
+                b.price,
+                b.stock,
+                b.description,
+                b.status,
+                b.create_time,
+                b.update_time
+                FROM books b
+                INNER JOIN category_tree ct ON b.category_id = ct.id
+                WHERE b.status = 1 ORDER BY b.id LIMIT #{limit} OFFSET #{offset}
+
+            </otherwise>
+        </choose>
     </select>
+
 </mapper>

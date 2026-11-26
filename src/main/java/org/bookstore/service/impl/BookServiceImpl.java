@@ -25,7 +25,7 @@ public class BookServiceImpl implements BookService {
         return MybatisUtil.execute(BookMapper.class, bookMapper -> {
             long total = bookMapper.selectCountByCategory(query.getCategoryId());
             PageResult<BookDTO> pageResult = PageResult.create(query, total);
-            List<BookDTO> bookDTOS = bookMapper.selectPageByCategory(pageResult.getPageSize(), pageResult.getOffset(), pageResult.getTotalRecords());
+            List<BookDTO> bookDTOS = bookMapper.selectPageByCategory(pageResult.getPageSize(), pageResult.getOffset(), query.getCategoryId());
             pageResult.setList(bookDTOS);
             return pageResult;
         });
