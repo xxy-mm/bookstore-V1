@@ -12,9 +12,9 @@ public interface UserService {
      * @param nickname the nickname of the user
      * @param email    the email of the user
      * @param phone    the phone of the user
-     * @return the generated id of the user
+     * @return the affected row of this action
      */
-    long register(String username, String password, String nickname, String email, String phone);
+    int register(String username, String password, String nickname, String email, String phone);
 
     UserDTO login(String username, String password);
 }

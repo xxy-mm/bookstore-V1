@@ -7,5 +7,5 @@ public interface UserMapper {
     User findByUsername(String username);
 
 
-    long insertUser(User user);
+    int insertUser(User user);
 }
