@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface CategoryMapper {
 
-    Category findById(long id);
+    Category selectById(Long id);
 
-    List<Category> findAll(Integer status);
+    List<Category> selectAll(Integer status);
 
-    List<Category> selectChildren(long parentId);
+    List<Category> selectChildren(Long parentId);
 }

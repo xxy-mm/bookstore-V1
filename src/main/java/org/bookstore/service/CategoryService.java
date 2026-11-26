@@ -14,14 +14,14 @@ public interface CategoryService {
      *
      * @return {@link List<Category>} all categories, or empty list if none exist
      */
-    List<Category> findAll();
+    List<Category> selectAll();
 
     /**
      * find all enabled categories
      *
      * @return {@link List<Category>} all enabled categories, or empty list if none exist
      */
-    List<Category> findAllEnabled();
+    List<Category> selectAllEnabled();
 
     /**
      * check weather the category is enabled or not
@@ -29,7 +29,5 @@ public interface CategoryService {
      * @param categoryId the id of the category
      * @return true if enabled, false if not.
      */
-    boolean isEnabled(long categoryId);
-
-    List<Category> selectChildren(long parentId);
+    boolean isEnabled(Long categoryId);
 }

@@ -10,11 +10,11 @@
     </sql>
 
 
-    <select id="findById" resultType="category">
+    <select id="selectById" resultType="category">
         <include refid="select category entity"/>
         where id = #{id} order by sort, id
     </select>
-    <select id="findAll" resultType="org.bookstore.entity.Category">
+    <select id="selectAll" resultType="org.bookstore.entity.Category">
         <include refid="select category entity"/>
         <where>
             <if test="status != null">
