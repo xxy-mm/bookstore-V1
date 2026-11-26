@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.bookstore.dao.impl.UserDaoImpl;
 import org.bookstore.exception.UsernameAlreadyExistsException;
 import org.bookstore.service.UserService;
 import org.bookstore.service.impl.UserServiceImpl;
@@ -19,7 +18,7 @@ import java.io.IOException;
 @WebServlet("/register")
 public class UserRegisterServlet extends HttpServlet {
 
-    private final UserService userService = new UserServiceImpl(new UserDaoImpl());
+    private final UserService userService = new UserServiceImpl();
     private final String SUCCESS_MSG_ATTRIBUTE_KEY = "successMsg";
 
     @Override

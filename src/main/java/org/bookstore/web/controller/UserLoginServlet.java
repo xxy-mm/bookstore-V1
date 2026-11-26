@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.bookstore.dao.impl.UserDaoImpl;
 import org.bookstore.dto.UserDTO;
 import org.bookstore.exception.InvalidCredentialsException;
 import org.bookstore.service.UserService;
@@ -19,7 +18,7 @@ import java.io.IOException;
 @WebServlet("/login")
 public class UserLoginServlet extends HttpServlet {
 
-    private final UserService userService = new UserServiceImpl(new UserDaoImpl());
+    private final UserService userService = new UserServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
