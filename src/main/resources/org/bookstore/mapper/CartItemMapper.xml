@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.bookstore.mapper.CartItemMapper">
+
+    <sql id="entity cols">
+        id, user_id, book_id, quantity, create_time, update_time
+    </sql>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO cart_items (user_id, book_id, quantity)
+        VALUES (#{userId}, #{bookId}, #{quantity})
+        ON DUPLICATE KEY UPDATE id       = LAST_INSERT_ID(id),
+                                quantity = quantity + #{quantity}
+    </insert>
+    <update id="update">
+        UPDATE cart_items
+        SET quantity = #{quantity}
+        WHERE id = #{id}
+    </update>
+    <delete id="delete">
+        DELETE
+        FROM cart_items
+        WHERE id = #{id}
+    </delete>
+    <select id="selectList" resultType="CartItem">
+        SELECT <include refid="entity cols"></include> FROM cart_items;
+    </select>
+
+
+</mapper>
